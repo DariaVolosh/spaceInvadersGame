@@ -141,8 +141,11 @@ while True:
         for moving_invader_i in range(len(moving_invaders[row])):
             invader = moving_invaders[row][moving_invader_i][0]
 
-            print("BEFOREEEEEEE")
-            print(moving_invaders[row][moving_invader_i][0], "row:", row)
+            #print("BEFOREEEEEEE")
+            #print(moving_invaders[row][moving_invader_i][0], "row:", row)
+            #print(moving_invaders)
+            #print(killed_invaders)
+            #print(static_invaders)
 
             # next invader, that the current invader collides with while moving to the right side
             # case 1 (row, current_moving_invader) < (row, static_invader) (NEXT COLLIDED INVADER) < (row, next_moving_invader) OR
@@ -150,84 +153,68 @@ while True:
             right_collided_invader = -1
             left_collided_invader = -1
 
-            # checking case 1: (static one)
-            if moving_invader_i + 1 < len(moving_invaders[row]):
-                for static_invader in range(invader + 1, moving_invaders[row][moving_invader_i+1][0]):
-                    if static_invader in static_invaders[row]:
-                        right_collided_invader = static_invader
-                        break
+            is_right_border_collided = False
+            is_left_border_collided = False
 
-            # checking case 2: (moving one)
-            if right_collided_invader == -1:
-                for static_invader in range(invader - 1, 0, -1):
-                    if static_invader in static_invaders[row]:
-                        static_invader_before_current_moving_invader = static_invader
-                        index = static_invaders[row].index(static_invader_before_current_moving_invader)
+            for i in range(invader+1, invaders_per_row):
+                if i in static_invaders[row] or len(list(filter(lambda x: x[0] == i, moving_invaders[row]))) == 1:
+                    right_collided_invader = i
+                    break
 
-                        if moving_invader_i + 1 < len(moving_invaders[row]):
-                            if static_invaders[row][index + 1] > moving_invaders[row][moving_invader_i + 1][0]:
-                                right_collided_invader = moving_invaders[row][moving_invader_i + 1][0]
-                        else:
-                            right_collided_invader = static_invaders[row][index + 1]
+            if invader+1 == invaders_per_row:
+                is_right_border_collided = True
 
-                        break
+            for i in range(invader - 1, -1, -1):
+                if i in static_invaders[row] or len(list(filter(lambda x: x[0] == i, moving_invaders[row]))) == 1:
+                    left_collided_invader = i
+                    break
 
-            # next invader, that the current invader collides with while moving to the left side
-            # case 1 (row, previous_moving_invader) < (row, static_invader) (NEXT COLLIDED_INVADER) < (row, current_moving_invader)
-            # case 2 (row, static_invader) < (row, previous_moving_invader) (NEXT COLLIDED INVADER) < (row, current_moving_invader) < (row, next_static_invader)
-
-            # checking case 1: (static one)
-            if moving_invader_i - 1 >= 0:
-                for static_invader in range(invader-1, len(moving_invaders[row][moving_invader_i - 1]), -1):
-                    if static_invader in static_invaders[row]:
-                        left_collided_invader = static_invader
-                        break
-
-            # checking case 2: (moving one)
-            if left_collided_invader == -1:
-                for static_invader in range(invader + 1, static_invaders[row][-1]):
-                    if static_invader in static_invaders[row]:
-                        static_invader_after_current_moving_invader = static_invader
-                        index = static_invaders[row].index(static_invader_after_current_moving_invader)
-
-                        if moving_invader_i - 1 >= 0:
-                            if static_invaders[row][index - 1] < moving_invaders[row][moving_invader_i - 1][0]:
-                                left_collided_invader = moving_invaders[row][moving_invader_i - 1][0]
-                        else:
-                            left_collided_invader = static_invaders[row][index - 1]
-
-                        break
-
-            # determine moving direction for current moving invader
+            if invader-1 < 0:
+                is_left_border_collided = True
 
             direction_right = moving_invaders[row][moving_invader_i][1]
 
-            print(left_collided_invader, moving_invaders[row][moving_invader_i][0], right_collided_invader)
-            # print(invaders_x[row][right_collided_invader[1]], invaders_x[row][invader])
-            # print(invaders_x[row][left_collided_invader[1]], invaders_x[row][invader])
-            # print("killed", killed_invaders)
-            # print("moving", moving_invaders)
-            # print("static", static_invaders)
+            #print(left_collided_invader, moving_invaders[row][moving_invader_i][0], right_collided_invader)
+            #print("is moving right", direction_right)
+            #print("is right border collided", is_right_border_collided)
+            #print("is left border collided", is_left_border_collided)
 
             if direction_right:
-                if invaders_x[row][right_collided_invader] - invaders_x[row][
-                    invader] >= invaders_padding + invader_width:
+                if is_right_border_collided:
+                    #print(screen_width - outside_padding - invader_width, invaders_x[row][invader])
+                    if screen_width - outside_padding - invader_width <= invaders_x[row][invader]:
+                        moving_invaders[row][moving_invader_i][1] = False
+
                     invaders_x[row][invader] += invader_speed
                 else:
-                    moving_invaders[row][moving_invader_i][1] = False
+                    if invaders_x[row][right_collided_invader] - invaders_x[row][invader] >= invaders_padding + invader_width:
+                        invaders_x[row][invader] += invader_speed
+                    else:
+                        moving_invaders[row][moving_invader_i][1] = False
 
-                    if right_collided_invader not in static_invaders[row]:
-                        moving_invaders[row][moving_invader_i + 1][1] = True
+                        if right_collided_invader not in static_invaders[row]:
+                            moving_invaders[row][moving_invader_i + 1][1] = True
+            else:
+                if is_left_border_collided:
+                    if invaders_x[row][invader] <= outside_padding:
+                        moving_invaders[row][moving_invader_i][1] = True
 
-            if not direction_right:
-                if invaders_x[row][invader] - invaders_x[row][
-                    left_collided_invader] >= invaders_padding + invader_width:
                     invaders_x[row][invader] -= invader_speed
                 else:
-                    moving_invaders[row][moving_invader_i][1] = True
+                    if invaders_x[row][invader] - invaders_x[row][left_collided_invader] >= invaders_padding + invader_width:
+                        invaders_x[row][invader] -= invader_speed
+                    else:
+                        moving_invaders[row][moving_invader_i][1] = True
 
-                    if left_collided_invader not in static_invaders[row]:
-                        moving_invaders[row][moving_invader_i - 1][1] = False
+                        if left_collided_invader not in static_invaders[row]:
+                            moving_invaders[row][moving_invader_i - 1][1] = False
+
+
+            #print("AFTERRRRRRR")
+            #print(left_collided_invader, moving_invaders[row][moving_invader_i][0], right_collided_invader)
+            #print("is moving right", moving_invaders[row][moving_invader_i][1])
+            #print("is right border collided", is_right_border_collided)
+            #print("is left border collided", is_left_border_collided)
 
 
     if is_left_pressed:
@@ -264,11 +251,11 @@ while True:
                         # current invader is being added to the list of killed invaders
                         killed_invaders[row].append(invader)
 
-                        print("BEFOREEE-----")
-                        print(row, invader)
-                        print(moving_invaders)
-                        print(killed_invaders)
-                        print(static_invaders)
+                        #print("BEFOREEE-----")
+                        #print(row, invader)
+                        #print(moving_invaders)
+                        #print(killed_invaders)
+                        #print(static_invaders)
 
                         # added left and right invader to the list of moving invaders, since they have the space
                         # between each other after killing the invader between them (if these invaders are not moving)
@@ -285,7 +272,7 @@ while True:
                                 invader + 1 not in killed_invaders[row]
 
                         ):
-                            print("condition true", invader - 1, invader+1)
+                            #print("condition true", invader - 1, invader+1)
                             moving_invaders[row].append([invader - 1, True])
                             moving_invaders[row].append([invader + 1, False])
 
@@ -304,10 +291,10 @@ while True:
                         if invader in static_invaders[row]:
                             static_invaders[row].remove(invader)
 
-                        print(row, invader)
-                        print(moving_invaders)
-                        print(killed_invaders)
-                        print(static_invaders)
+                        #print(row, invader)
+                        #print(moving_invaders)
+                        #print(killed_invaders)
+                        #print(static_invaders)
 
                         #print(active_invaders)
                         is_bullet_fired = False
