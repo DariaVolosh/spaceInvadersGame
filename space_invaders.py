@@ -141,11 +141,11 @@ while True:
         for moving_invader_i in range(len(moving_invaders[row])):
             invader = moving_invaders[row][moving_invader_i][0]
 
-            #print("BEFOREEEEEEE")
-            #print(moving_invaders[row][moving_invader_i][0], "row:", row)
-            #print(moving_invaders)
-            #print(killed_invaders)
-            #print(static_invaders)
+            print("BEFOREEEEEEE")
+            print(moving_invaders[row][moving_invader_i][0], "row:", row)
+            print(moving_invaders)
+            print(killed_invaders)
+            print(static_invaders)
 
             # next invader, that the current invader collides with while moving to the right side
             # case 1 (row, current_moving_invader) < (row, static_invader) (NEXT COLLIDED INVADER) < (row, next_moving_invader) OR
@@ -161,7 +161,7 @@ while True:
                     right_collided_invader = i
                     break
 
-            if invader+1 == invaders_per_row:
+            if invader+1 == invaders_per_row or all(num in killed_invaders[row] for num in range(invader+1, invaders_per_row)):
                 is_right_border_collided = True
 
             for i in range(invader - 1, -1, -1):
@@ -169,15 +169,15 @@ while True:
                     left_collided_invader = i
                     break
 
-            if invader-1 < 0:
+            if invader-1 < 0 or all(num in killed_invaders[row] for num in range(invader-1, -1, -1)):
                 is_left_border_collided = True
 
             direction_right = moving_invaders[row][moving_invader_i][1]
 
-            #print(left_collided_invader, moving_invaders[row][moving_invader_i][0], right_collided_invader)
-            #print("is moving right", direction_right)
-            #print("is right border collided", is_right_border_collided)
-            #print("is left border collided", is_left_border_collided)
+            print(left_collided_invader, moving_invaders[row][moving_invader_i][0], right_collided_invader)
+            print("is moving right", direction_right)
+            print("is right border collided", is_right_border_collided)
+            print("is left border collided", is_left_border_collided)
 
             if direction_right:
                 if is_right_border_collided:
@@ -265,7 +265,9 @@ while True:
 
                         is_killed_invader_moving = list(filter(lambda x: x[0] == invader, moving_invaders[row]))
                         if (
-                                len(list(filter(lambda x: x[0] == invader-1, moving_invaders[row]))) == 0 and
+                                invader + 1 < invaders_per_row and
+                                invader - 1 >= 0 and
+                                len(list(filter(lambda x: x[0] == invader - 1, moving_invaders[row]))) == 0 and
                                 len(list(filter(lambda x: x[0] == invader+1, moving_invaders[row]))) == 0 and
                                 len(is_killed_invader_moving) == 0 and
                                 invader - 1 not in killed_invaders[row] and
