@@ -1,6 +1,5 @@
 import json
 from time import sleep
-from lottie.objects import Animation
 import pygame
 
 pygame.init()
@@ -141,12 +140,6 @@ while True:
         for moving_invader_i in range(len(moving_invaders[row])):
             invader = moving_invaders[row][moving_invader_i][0]
 
-            print("BEFOREEEEEEE")
-            print(moving_invaders[row][moving_invader_i][0], "row:", row)
-            print(moving_invaders)
-            print(killed_invaders)
-            print(static_invaders)
-
             # next invader, that the current invader collides with while moving to the right side
             # case 1 (row, current_moving_invader) < (row, static_invader) (NEXT COLLIDED INVADER) < (row, next_moving_invader) OR
             # case 2 (row, static_invader) < (row, current_moving_invader) < (row, next_moving_invader) (NEXT COLLIDED INVADER) < (row, next_static_invader)
@@ -173,11 +166,6 @@ while True:
                 is_left_border_collided = True
 
             direction_right = moving_invaders[row][moving_invader_i][1]
-
-            print(left_collided_invader, moving_invaders[row][moving_invader_i][0], right_collided_invader)
-            print("is moving right", direction_right)
-            print("is right border collided", is_right_border_collided)
-            print("is left border collided", is_left_border_collided)
 
             if direction_right:
                 if is_right_border_collided:
@@ -210,13 +198,6 @@ while True:
                             moving_invaders[row][moving_invader_i - 1][1] = False
 
 
-            #print("AFTERRRRRRR")
-            #print(left_collided_invader, moving_invaders[row][moving_invader_i][0], right_collided_invader)
-            #print("is moving right", moving_invaders[row][moving_invader_i][1])
-            #print("is right border collided", is_right_border_collided)
-            #print("is left border collided", is_left_border_collided)
-
-
     if is_left_pressed:
         player_x -= player_speed
     if is_right_pressed:
@@ -240,30 +221,19 @@ while True:
         screen.blit(bullet_image, (bullet_x, bullet_y))
         bullet_y -= bullet_speed
         if bullet_y <= invaders_rows_y[-1] + invader_height:
-            #print("bullet x:", bullet_x)
             for row in range(len(invaders)):
                 for invader in range(len(invaders[row])):
-                    #print(row, invaders_x[row][invader_x])
-                    #print(invaders_x[row][invader] <= bullet_x <= invaders_x[row][invader] + invader_width)
                     if (invaders_x[row][invader] <= bullet_x <= invaders_x[row][invader] + invader_width and
                             bullet_y <= invaders_rows_y[row] and invader not in killed_invaders[row]
                     ):
                         # current invader is being added to the list of killed invaders
                         killed_invaders[row].append(invader)
 
-                        #print("BEFOREEE-----")
-                        #print(row, invader)
-                        #print(moving_invaders)
-                        #print(killed_invaders)
-                        #print(static_invaders)
-
                         # added left and right invader to the list of moving invaders, since they have the space
                         # between each other after killing the invader between them (if these invaders are not moving)
 
-                        #print(len(list(filter(lambda x: print(x[0]), moving_invaders))))
-                        #print(len(list(filter(lambda x: x[0] == (row, invader+1), moving_invaders))))
-
                         is_killed_invader_moving = list(filter(lambda x: x[0] == invader, moving_invaders[row]))
+
                         if (
                                 invader + 1 < invaders_per_row and
                                 invader - 1 >= 0 and
@@ -274,7 +244,6 @@ while True:
                                 invader + 1 not in killed_invaders[row]
 
                         ):
-                            #print("condition true", invader - 1, invader+1)
                             moving_invaders[row].append([invader - 1, True])
                             moving_invaders[row].append([invader + 1, False])
 
@@ -293,12 +262,6 @@ while True:
                         if invader in static_invaders[row]:
                             static_invaders[row].remove(invader)
 
-                        #print(row, invader)
-                        #print(moving_invaders)
-                        #print(killed_invaders)
-                        #print(static_invaders)
-
-                        #print(active_invaders)
                         is_bullet_fired = False
                         is_explosion_animation_in_progress = True
                         current_killed_invader_row = row
