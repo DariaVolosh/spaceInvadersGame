@@ -116,17 +116,13 @@ while True:
             if event.key == pygame.K_LEFT:
                 is_left_pressed = True
             elif event.key == pygame.K_RIGHT:
-                print('right down')
                 is_right_pressed = True
             elif event.key == pygame.K_SPACE:
-                print('space down')
                 is_bullet_fired = True
         elif event.type == pygame.KEYUP:
             if event.key == pygame.K_LEFT:
-                print('left up')
                 is_left_pressed = False
             elif event.key == pygame.K_RIGHT:
-                print('right up')
                 is_right_pressed = False
 
     screen.fill((0, 0, 0))
