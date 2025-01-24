@@ -45,23 +45,20 @@ invader_speed = 1
 invaders_per_row_float = (screen_width + invaders_padding) / (invader_width + invaders_padding)
 invaders_per_row = int(invaders_per_row_float)
 outside_padding = int(round(invaders_per_row_float - invaders_per_row, 2) * (invader_width + invaders_padding) / 2)
+invader_image = pygame.transform.scale(pygame.image.load("images/space_invader.png"), (invader_width, invader_height))
 
 current_killed_invader_row = 0
 current_killed_invader_index = 0
 
-invaders = []
 killed_invaders = []
 moving_invaders = []
 static_invaders = []
 for row in range(invaders_rows):
-    invaders_row = []
     x_row = []
     static_invaders_row = []
 
     for invader in range(invaders_per_row):
         static_invaders_row.append(invader)
-        invader_image = pygame.transform.scale(pygame.image.load("images/space_invader.png"), (invader_width, invader_height))
-        invaders_row.append(invader_image)
         if invader == 0:
             x_row.append(outside_padding)
         else:
@@ -73,7 +70,6 @@ for row in range(invaders_rows):
         invaders_rows_y.append(invaders_rows_y[row-1] + invader_height + invaders_row_padding)
 
     invaders_x.append(x_row)
-    invaders.append(invaders_row)
     static_invaders.append(static_invaders_row)
     killed_invaders.append([])
     moving_invaders.append([])
@@ -127,10 +123,10 @@ while True:
 
     screen.fill((0, 0, 0))
 
-    for row in range(len(invaders)):
-        for invader in range(len(invaders[row])):
+    for row in range(len(invaders_x)):
+        for invader in range(len(invaders_x[row])):
             if invader not in killed_invaders[row]:
-                screen.blit(invaders[row][invader], (invaders_x[row][invader], invaders_rows_y[row]))
+                screen.blit(invader_image, (invaders_x[row][invader], invaders_rows_y[row]))
 
     for row in range(len(moving_invaders)):
         for moving_invader_i in range(len(moving_invaders[row])):
@@ -217,8 +213,8 @@ while True:
         screen.blit(bullet_image, (bullet_x, bullet_y))
         bullet_y -= bullet_speed
         if bullet_y <= invaders_rows_y[-1] + invader_height:
-            for row in range(len(invaders)):
-                for invader in range(len(invaders[row])):
+            for row in range(len(invaders_x)):
+                for invader in range(len(invaders_x[row])):
                     if (invaders_x[row][invader] <= bullet_x <= invaders_x[row][invader] + invader_width and
                             bullet_y <= invaders_rows_y[row] and invader not in killed_invaders[row]
                     ):
